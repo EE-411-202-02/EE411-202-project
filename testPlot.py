@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 root = Tk()
 l0 = Label(root, text="Hello world!").grid(row=0, column=0)
-l0 = Label(root, text="DEEZ NUTZ!").grid(row=1, column=0)
+l0 = Label(root, text="line 2!").grid(row=1, column=0)
 
 root.mainloop()
 
