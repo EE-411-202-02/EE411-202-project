@@ -1,0 +1,5 @@
+numpy
+pylibiio
+
+[jesd]
+fs.sshfs
