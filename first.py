@@ -14,7 +14,7 @@ while i < 1000:
 
 # Setup(input):
 resolution = 50                     # Range resolution in m.
-maxRange = 5e3                     # Maximum range in m.
+maxRange = 5e3                      # Maximum range in m.
 fc = int(5.8e9)                     # Carrier frequency.
 fsx = 4                             # Fs = fsx*2*pulseBW. *has to be supported by the ADC
 plutoIP = "192.168.2.1"
@@ -32,12 +32,20 @@ numSamples = int((1/prf)*fs+2*fsx)      # Number of samples to process.
 txS = np.zeros(20)
 txS[fsx:2*fsx] = 2**14             # samples are between -2^14 and +2^14
 
-# Tx setup:
+# SDR setup:
 #sdr = adi.Pluto(plutoIP)            # Connect to SDR.
-#sdr.sample_rate = int(fs)           # send sampling rate (shared between Rx and Tx).
-#sdr.tx_rf_bandwidth = int(fs)       # same as sampling rate.
-#sdr.tx_lo = int(fc)                 # Tx local oscillator.
-#sdr.tx_hardwaregain_chan0 = 0       # 0 for lowest gain, (-90 for highest).
+
+# Tx setup:
+#sdr.sample_rate = int(fs)                  # Send sampling rate (shared between Rx and Tx).
+#sdr.tx_rf_bandwidth = int(fs/(2*fsx))      # Same as sampling rate.
+#sdr.tx_lo = int(fc)                        # Tx local oscillator.
+#sdr.tx_hardwaregain_chan0 = 0              # Attenuation applied to Tx path.
+
+# Rx Setup:
+#sdr.rx_rf_bandwidth = int(fs/(2*fsx))      # Same as sampling rate.
+#sdr.rx_lo = int(fc)                        # Rx local oscillator.
+#sdr.gain_control_mode_chan0 = "manual"     # turn off AGC.
+#sdr.rx_hardwaregain_chan0 = 0              # Rx gain.
 
 # Tx send:
 #sdr.tx(txS)                        # Send the signal.
