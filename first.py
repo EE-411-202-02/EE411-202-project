@@ -33,7 +33,7 @@ txS = np.zeros(20)
 txS[fsx:2*fsx] = 2**14             # samples are between -2^14 and +2^14
 
 # SDR setup:
-#sdr = adi.Pluto(plutoIP)            # Connect to SDR.
+sdr = adi.Pluto(plutoIP)            # Connect to SDR.
 
 # Tx setup:
 #sdr.sample_rate = int(fs)                  # Send sampling rate (shared between Rx and Tx).
@@ -44,13 +44,15 @@ txS[fsx:2*fsx] = 2**14             # samples are between -2^14 and +2^14
 # Rx Setup:
 #sdr.rx_rf_bandwidth = int(fs/(2*fsx))      # Same as sampling rate.
 #sdr.rx_lo = int(fc)                        # Rx local oscillator.
-#sdr.gain_control_mode_chan0 = "manual"     # turn off AGC.
+#sdr.gain_control_mode_chan0 = "manual"     # Turn off AGC.
 #sdr.rx_hardwaregain_chan0 = 0              # Rx gain.
+#sdr.rx_buffer_size()                       # Rx buffer size.
 
 # Tx send:
 #sdr.tx(txS)                        # Send the signal.
 #sdr.tx_cyclic_buffer = True        # Enable cyclic buffers.
 #sdr.tx_destroy_buffer()            # Must be used to send a different signal.
+sdr.rx()
 
 # output
 print("Number of range steps:", rangeSteps)
