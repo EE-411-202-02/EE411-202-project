@@ -48,6 +48,8 @@ sdr = adi.Pluto(plutoIP)            # Connect to SDR.
 #sdr.rx_hardwaregain_chan0 = 0              # Rx gain.
 #sdr.rx_buffer_size()                       # Rx buffer size.
 
+#new comment
+
 # Tx send:
 #sdr.tx(txS)                        # Send the signal.
 #sdr.tx_cyclic_buffer = True        # Enable cyclic buffers.
