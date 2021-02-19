@@ -5,18 +5,18 @@ import adi
 import matplotlib.pyplot as plt
 
 # Time delay
-i = 0
-td = 0
-while i < 1000:
-    t0, t1 = time.thread_time_ns(), time.thread_time_ns()
-    td = max(td, t1 - t0)
-    i += 1
+#i = 0
+#td = 0
+#while i < 1000:
+#    t0, t1 = time.thread_time_ns(), time.thread_time_ns()
+#    td = max(td, t1 - t0)
+#    i += 1
 
 # Setup(input):
-resolution = 50                     # Range resolution in m.
+resolution = 20                     # Range resolution in m.
 maxRange = 5e3                      # Maximum range in m.
 fc = int(5.8e9)                     # Carrier frequency.
-fsx = 4                             # Fs = fsx*2*pulseBW. *has to be supported by the ADC
+fsx = 2                             # Fs = fsx*2*pulseBW. *has to be supported by the ADC
 plutoIP = "192.168.2.1"
 
 # Setup(calculations):
@@ -54,7 +54,7 @@ sdr = adi.Pluto(plutoIP)            # Connect to SDR.
 #sdr.tx(txS)                        # Send the signal.
 #sdr.tx_cyclic_buffer = True        # Enable cyclic buffers.
 #sdr.tx_destroy_buffer()            # Must be used to send a different signal.
-sdr.rx()
+#sdr.rx()
 
 # output
 print("Number of range steps:", rangeSteps)
@@ -62,5 +62,6 @@ print("Buffer size:", numSamples, 'samples.')
 print("Pulse BW:", pulseBW/1000000, "MHz")
 print("Sampling frequency:", fs/1000000, "MHz")
 print("Pulse width:", pulseWidth*1e9, "ns")
-print("Time delay:", td, "ns")
-print("Steps skipped:", int(round(td/(pulseWidth*1e9))))
+
+#print("Time delay:", td, "ns")
+#print("Steps skipped:", int(round(td/(pulseWidth*1e9))))
