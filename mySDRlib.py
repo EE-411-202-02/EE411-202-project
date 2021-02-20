@@ -26,7 +26,9 @@ class SDR:
         self.sdr = None                 # Empty adi object.
         self.tx_signal = 0              # Tx pulse.
         self.rx_signal = 0              # Rx signal.
-        self.dwell_time = 0         # Dwell time in seconds.
+        self.dwell_time = 0             # Dwell time in seconds.
+        self.tx_1_pulse = None
+        self.sample_per_step = None
 
     def calculate(self):
         # Calculate parameters:
@@ -36,11 +38,17 @@ class SDR:
         self.pulse_width = 1 / self.pulse_BW
         self.sampling_frequency = self.fsx * 2 * self.pulse_BW
         self.repetition_frequency = prop_speed/(2*self.max_range)
-        self.num_samples = int((1 / self.repetition_frequency) * self.sampling_frequency + 2 * self.fsx)
+        self.dwell_time = 1/self.repetition_frequency
+        self.num_samples = int(self.dwell_time * self.sampling_frequency)
 
         # Generate pulse:
-        self.tx_signal = np.zeros(20)
-        self.tx_signal[self.fsx:2 * self.fsx] = 2 ** 14  # samples are between -2^14 and +2^14
+        self.tx_1_pulse = np.zeros(self.num_samples)
+        self.tx_signal = np.zeros(self.num_samples*self.num_pulses)
+        self.sample_per_step = self.num_samples/self.range_steps
+        self.tx_1_pulse[0:int(self.sample_per_step)] = 2 ** 14
+
+        for i in range(self.num_pulses):
+            self.tx_signal[i*self.num_samples:(i+1)*self.num_samples] = self.tx_1_pulse
 
     def connect(self):
         self.sdr = adi.Pluto(self.ip)
