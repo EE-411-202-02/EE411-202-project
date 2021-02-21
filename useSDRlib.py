@@ -12,6 +12,7 @@ num_pulses = 2                     # Number of pulses per trigger.
 # create sdr object:
 sdr = SDR()
 
+
 # set the parameters in program memory:
 sdr.resolution = resolution
 sdr.max_range = max_range
