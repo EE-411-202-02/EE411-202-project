@@ -2,13 +2,13 @@
 from mySDRlib import SDR
 
 # These are the inputs to pass to the SDR:
-resolution = 50                     # Range resolution in m.
-max_range = 5e3                     # Maximum range in m.
+resolution = 25                     # Range resolution in m.
+max_range = 2e3                     # Maximum range in m.
 fc = int(5.8e9)                     # Carrier frequency.
-fsx = 2                             # Fs = fsx*2*pulseBW. *has to be supported by the ADC
+fsx = 4                             # Fs = fsx*2*pulseBW. *has to be supported by the ADC
 plutoIP = "192.168.2.1"
 tx_attenuation = 0                  # Attenuation applied to Tx path (0dB to -90dB).
-num_pulses = 2                     # Number of pulses per trigger.
+num_pulses = 1                      # Number of pulses per trigger.
 # create sdr object:
 sdr = SDR()
 
@@ -33,9 +33,12 @@ sdr.calculate()
 # send and receive
 # sdr.pulse()
 
-print("Pulse BW:", sdr.pulse_BW/1000000, "MHz")
+print("Max range:", sdr.max_range, "m")
+print("Resolution:", sdr.resolution, "m")
+print("Number of range steps:", sdr.range_steps, "steps")
+print("Samples per step", sdr.sample_per_step)
+print("Pulse BW:", sdr.pulse_BW/1e6, "MHz")
 print("Pulse width:", sdr.pulse_width*1e9, "ns")
 print("Sampling frequency:", sdr.sampling_frequency/1000000, "MHz")
-print("Number of range steps:", sdr.range_steps)
-print("Buffer size:", sdr.num_samples, 'samples.')
-print(sdr.tx_signal)
+print("Rx buffer size:", sdr.rx_buffer_size, "samples")
+print("Buffer time:", sdr.dwell_time*1e6, "us")
