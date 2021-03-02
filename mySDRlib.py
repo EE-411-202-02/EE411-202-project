@@ -4,7 +4,7 @@ import numpy as np
 import scipy.constants as con
 import adi
 import time
-
+import copy
 
 class SDR:
     def __init__(self):
@@ -43,12 +43,13 @@ class SDR:
         self.dwell_time = 1/self.repetition_frequency                       # Time per scan in one direction (s).
         self.num_samples = int(self.dwell_time * self.sampling_frequency)   # Number of useful samples.
         self.sample_per_step = int(self.num_samples / self.range_steps)     # Number of samples per step.
-        self.rx_buffer_size = self.num_samples + 2 * self.sample_per_step   # size of the Rx buffer.
+        self.rx_buffer_size = int((self.range_steps+2)*2*self.sample_per_step)   # size of the Rx buffer.
 
         # Generate pulse:
-        self.tx_pulse = np.zeros(3*self.sample_per_step)
-        self.tx_pulse[self.sample_per_step:2*self.sample_per_step] = np.ones(self.sample_per_step)
-        self.tx_pulse = self.tx_pulse * (2**14)
+        self.tx_pulse = np.zeros(self.num_samples)
+        d = 1
+        self.tx_pulse[d * self.sample_per_step:(d + 1) * self.sample_per_step] = 1
+        self.tx_pulse = self.tx_pulse * (2 ** 14)
 
     def connect(self):
         self.sdr = adi.Pluto(self.ip)
@@ -60,13 +61,18 @@ class SDR:
         self.sdr.tx_hardwaregain_chan0 = self.tx_attenuation        # Attenuation applied to Tx path.
 
         self.sdr.rx_rf_bandwidth = int(self.sampling_frequency)     # Same as sampling rate.
-        self.sdr.rx_lo = int(self.fsx)                              # Rx local oscillator.
+        self.sdr.rx_lo = int(self.carrier_frequency)                # Rx local oscillator.
         self.sdr.gain_control_mode_chan0 = "manual"                 # Turn off AGC.
-        self.sdr.rx_hardwaregain_chan0 = 0                          # Rx gain.
-        self.sdr.rx_buffer_size(self.rx_buffer_size)                # Rx buffer size.
+        self.sdr.rx_hardwaregain_chan0 = 20                         # Rx gain.
+        self.sdr.rx_buffer_size = self.rx_buffer_size               # Rx buffer size.
+        self.sdr.rx_enabled_channels = [0]
+        self.sdr.tx_enabled_channels = [0]
 
     def pulse(self):
         self.sdr.tx_destroy_buffer()        # Must be used to send a different signal.
-        self.sdr.tx(self.tx_signal)         # Send the pulse.
-        time.sleep(self.dwell_time)         # Dwell time.
+        self.sdr.tx_cyclic_buffer = True
+        self.sdr.tx(self.tx_pulse)          # Send the pulse.
         self.rx_signal = self.sdr.rx()      # Pull Rx buffer.
+        # time.sleep(self.dwell_time)       # Dwell time.
+
+
