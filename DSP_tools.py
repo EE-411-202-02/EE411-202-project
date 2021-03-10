@@ -24,7 +24,14 @@ class digital_signal:
         plt.figure(fig)
         plt.plot(self.n, self.x)
         plt.xlabel("n")
-        plt.ylabel("X[n]")
+        plt.ylabel("x[n]")
+        plt.show()
+
+    def stem_signal(self, fig):
+        plt.figure(fig)
+        plt.stem(self.n, self.x)
+        plt.xlabel("n")
+        plt.ylabel("x[n]")
         plt.show()
 
     def plot_fft(self, fig):
@@ -42,3 +49,4 @@ class digital_signal:
 
     def mov_avg(self, N):
         self.x = np.convolve(self.x, np.ones(N) / N, mode='valid')
+
