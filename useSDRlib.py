@@ -1,6 +1,8 @@
 # This is an example of using mySDRlib.
 from mySDRlib import SDR
 from DSP_tools import digital_signal
+from signal_processor import process
+
 import numpy as np
 import copy
 import time
@@ -14,13 +16,13 @@ matplotlib.use('TkAgg')
 
 # These are the inputs to pass to the SDR:
 
-resolution = 20                     # Range resolution in m.
-max_range = 10e3                    # Maximum range in m.
+resolution = 10                    # Range resolution in m.
+max_range = 2e3                     # Maximum range in m.
 fc = 5800e6                         # Carrier frequency.
-fsx = 2                             # Fs = fsx*2*pulseBW. *has to be supported by the ADC
+fsx = 1                             # Fs = fsx*2*pulseBW. *has to be supported by the ADC
 plutoIP = "ip:192.168.2.1"
 tx_attenuation = 0                  # Attenuation applied to Tx path (0dB to -90dB).
-num_pulses = 1                      # Number of pulses per trigger.
+num_pulses = 3                      # Number of pulses per trigger.
 # create sdr object:
 radar = SDR()
 
@@ -42,10 +44,32 @@ radar.connect()
 
 # send setup(after calculation):
 radar.send_setup()
-time.sleep(1)
+
+# get noise floor:
+radar.get_noise(500000)
+spn = process(radar.rx_signal)
+spn.filter(radar.sample_per_step)
+spn.get_threshold()
+print('Noise threshold:', spn.threshold)
+
+plt.figure(1)
+plt.plot(spn.si.hb[0:-1], spn.si.h)
 
 # send and receive
-radar.pulse()
+radar.start_tx()
+radar.get_rx()
+radar.stop_tx()
+
+sp = process(radar.rx_signal)
+sp.filter(radar.sample_per_step)
+sp.sync(radar.samples_per_scan)
+print(np.size(sp.si.x))
+
+sp.si.gen_n()
+sp.si.stem_signal(2)
+sp.detect(spn.threshold)
+print('Detection at:', sp.d*radar.resolution)
+
 
 print("Max range:", radar.max_range, "m")
 print("Resolution:", radar.resolution, "m")
@@ -58,11 +82,14 @@ print("Rx buffer size:", radar.rx_buffer_size, "samples")
 print("Buffer time:", radar.dwell_time*1e6, "us")
 
 
-s0 = digital_signal()
-s0.fs = radar.sampling_frequency
-s0.N = np.size(s0.x)
-s0.x = np.abs(np.real(radar.rx_signal))
-s0.mov_avg(radar.sample_per_step)
-s0.gen_n()
-s0.plot_signal(1)
+
+
 plt.show()
+#print(sp.temp)
+
+
+
+#s0.add_samples(radar.sample_per_step)
+
+
+
