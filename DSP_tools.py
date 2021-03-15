@@ -4,6 +4,7 @@ import scipy.constants as con
 import matplotlib
 import matplotlib.pyplot as plt
 import scipy
+from scipy.stats import norm
 from scipy import signal
 import control
 
@@ -25,14 +26,12 @@ class digital_signal:
         plt.plot(self.n, self.x)
         plt.xlabel("n")
         plt.ylabel("x[n]")
-        plt.show()
 
     def stem_signal(self, fig):
         plt.figure(fig)
         plt.stem(self.n, self.x)
         plt.xlabel("n")
         plt.ylabel("x[n]")
-        plt.show()
 
     def plot_fft(self, fig):
         self.X = scipy.fft.fft(self.x)
@@ -41,7 +40,6 @@ class digital_signal:
         plt.semilogy(self.freq, np.abs(self.X))
         plt.xlabel('frequency [Hz]')
         plt.ylabel('P [dB]')
-        plt.show()
 
     def gain(self, db):
         a = control.db2mag(db)
@@ -49,4 +47,7 @@ class digital_signal:
 
     def mov_avg(self, N):
         self.x = np.convolve(self.x, np.ones(N) / N, mode='valid')
+
+    def histogram(self):
+        self.h, self.hb = np.histogram(self.x, bins=250)
 
